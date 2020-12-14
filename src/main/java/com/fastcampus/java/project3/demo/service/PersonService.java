@@ -75,4 +75,8 @@ public class PersonService {
         //return result.stream().filter(person->person.getName().equals(name)).collect(Collectors.toList());
         return personRepository.findByName(name);
     }
+
+    public void save(Person person) {
+        personRepository.save(person);
+    }
 }

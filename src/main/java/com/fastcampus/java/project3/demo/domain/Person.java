@@ -5,8 +5,9 @@ import com.sun.istack.NotNull;
 import lombok.*;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.validation.annotation.Validated;
-
 import javax.persistence.*;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
 
 
 import java.time.LocalDate;
@@ -23,14 +24,20 @@ public class Person {
     private Long id;
 
     @NonNull //@RequiredArgsConstructor에 의해 만들어진 생성자에 꼭 들어가게 만든다.
+    @Column(nullable = false)
+    @NotEmpty
     private String name;
 
+    //NotEmpty, Column은 지정을 해야 null값이 들어가지 않는다.
     @NonNull
+    @Min(1)//최소값을 지켜야 하므로
     private int age;
 
     private String hobby;
 
     @NonNull
+    @Column(nullable = false)
+    @NotEmpty
     private String bloodType;
 
     private String address;
