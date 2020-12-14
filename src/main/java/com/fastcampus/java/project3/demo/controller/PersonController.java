@@ -39,4 +39,11 @@ public class PersonController {
         personService.save(person);
         log.info("person -> {}",personRepository.findAll());
     }
+
+    //수정
+    @PutMapping(value="/{id}")
+    public void modifyPerson(@PathVariable Long id, @RequestBody Person person){
+        personService.modify(id,person);
+        log.info("person -> {}",personRepository.findAll());
+    }
 }
