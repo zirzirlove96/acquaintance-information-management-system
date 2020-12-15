@@ -1,9 +1,11 @@
 package com.fastcampus.java.project3.demo.domain;
 
 
+import com.fastcampus.java.project3.demo.dto.PersonDto;
 import com.sun.istack.NotNull;
 import lombok.*;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import javax.persistence.*;
 import javax.validation.constraints.Min;
@@ -56,6 +58,28 @@ public class Person {
     @ToString.Exclude
     private Block block;
 
-
+    public void set(PersonDto personDto){
+        if(personDto.getAge()!=0){
+            this.setAge(personDto.getAge());
+        }//나이의 값이 들어간 경우 set해준다.
+        if(!StringUtils.isEmpty(personDto.getName())){
+            this.setName(personDto.getName());
+        }//string문자열이 있는 경우 set해준다.
+        if(!StringUtils.isEmpty(personDto.getAddress())){
+            this.setAddress(personDto.getAddress());
+        }
+        if(!StringUtils.isEmpty(personDto.getBloodType())){
+            this.setBloodType(personDto.getBloodType());
+        }
+        if(!StringUtils.isEmpty(personDto.getHobby())){
+            this.setHobby(personDto.getHobby());
+        }
+        if(!StringUtils.isEmpty(personDto.getJob())){
+            this.setJob(personDto.getJob());
+        }
+        if(!StringUtils.isEmpty(personDto.getPhoneNumber())){
+            this.setPhoneNumber(personDto.getPhoneNumber());
+        }
+    }
 
 }

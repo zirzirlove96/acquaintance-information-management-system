@@ -62,10 +62,21 @@ class PersonControllerTest {
                 MockMvcRequestBuilders.put("/api/person/1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\n" +
-                        "\"name\":\"martin2\",\n" +
+                        "\"name\":\"martin\",\n" +
                         "  \"age\":20,\n" +
-                        "  \"bloodType\":\"A\"\n" +
+                        "  \"bloodType\":\"AB\"\n" +
                         "}"))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+    @Test //원래는 1번의 이름은 martin이였는데 이름만 martin22로 변경해준다.
+    void modifyPersonName() throws Exception {
+        mockMvc = MockMvcBuilders.standaloneSetup(personController).build();
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.patch("/api/person/1")
+                        .param("name","martin222"))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }

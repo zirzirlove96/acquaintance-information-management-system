@@ -1,4 +1,4 @@
-insert into person(`id`,`name`,`age`,`blood_type`,`year`,`month`,`day`) values (1,'martin',19,'A',1991,8,1);
+insert into person(`id`,`name`,`age`,`blood_type`,`year`,`month`,`day`,`job`) values (1,'martin',19,'A',1991,8,1,'programmer');
 insert into person(`id`,`name`,`age`,`blood_type`,`year`,`month`,`day`) values (2,'benny',19,'A',1992,7,21);
 insert into person(`id`,`name`,`age`,`blood_type`,`year`,`month`,`day`) values (3,'jiyoung',21,'B',1993,10,15);
 insert into person(`id`,`name`,`age`,`blood_type`,`year`,`month`,`day`) values (4,'lisa',18,'A',1994,8,31);

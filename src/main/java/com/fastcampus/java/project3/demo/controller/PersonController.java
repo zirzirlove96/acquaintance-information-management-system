@@ -1,6 +1,7 @@
 package com.fastcampus.java.project3.demo.controller;
 
 import com.fastcampus.java.project3.demo.domain.Person;
+import com.fastcampus.java.project3.demo.dto.PersonDto;
 import com.fastcampus.java.project3.demo.repository.PersonRepository;
 import com.fastcampus.java.project3.demo.service.PersonService;
 import lombok.extern.slf4j.Slf4j;
@@ -42,8 +43,14 @@ public class PersonController {
 
     //수정
     @PutMapping(value="/{id}")
-    public void modifyPerson(@PathVariable Long id, @RequestBody Person person){
-        personService.modify(id,person);
+    public void modifyPerson(@PathVariable Long id, @RequestBody PersonDto personDto){
+        personService.modify(id,personDto);
+        log.info("person -> {}",personRepository.findAll());
+    }
+
+    @PatchMapping(value="/{id}")//PatchMapping은 일부 데이터만 고친다는 뜻으로 사용한다.
+    public void modifyPerson(@PathVariable Long id, String name){
+        personService.modify(id,name);
         log.info("person -> {}",personRepository.findAll());
     }
 }

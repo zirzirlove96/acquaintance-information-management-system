@@ -1,7 +1,9 @@
 package com.fastcampus.java.project3.demo.service;
 
+import com.fastcampus.java.project3.demo.domain.Birthday;
 import com.fastcampus.java.project3.demo.domain.Block;
 import com.fastcampus.java.project3.demo.domain.Person;
+import com.fastcampus.java.project3.demo.dto.PersonDto;
 import com.fastcampus.java.project3.demo.repository.BlockRepository;
 import com.fastcampus.java.project3.demo.repository.PersonRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -80,19 +82,27 @@ public class PersonService {
         personRepository.save(person);
     }
 
-    public void modify(Long id, Person person) {
+    @Transactional
+    public void modify(Long id, PersonDto personDto) {
 
         Person personAtDb = personRepository.findById(id).orElseThrow(()->new RuntimeException("아이디가 존재하지 않습니다."));
 
-        personAtDb.setName(person.getName());
-        personAtDb.setAddress(person.getAddress());
-        personAtDb.setAge(person.getAge());
-        personAtDb.setBirthday(person.getBirthday());
-        personAtDb.setBloodType(person.getBloodType());
-        personAtDb.setHobby(person.getHobby());
-        personAtDb.setPhoneNumber(person.getPhoneNumber());
-        personAtDb.setJob(person.getJob());
+        if(!personAtDb.getName().equals(personDto.getName())){
+            throw new RuntimeException("이름이 다릅니다.");
+        }//일부러 에러를 발생시킨다.
+
+        personAtDb.set(personDto);
 
         personRepository.save(personAtDb);
+    }
+
+    @Transactional
+    public void modify(Long id, String name){
+        Person person = personRepository.findById(id).orElseThrow(()->new RuntimeException("아이디가 존재하지 않습니다."));
+
+        //변경된 이름을 받는다.
+        person.setName(name);
+
+        personRepository.save(person);
     }
 }
