@@ -7,12 +7,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
+@Transactional
 class PersonRepositoryTest {
 
     @Autowired
@@ -23,7 +25,6 @@ class PersonRepositoryTest {
     void crud() {
         Person person = new Person();
         person.setName("Kim");
-        person.setAge(25);
         person.setBloodType("A");
 
         personRepository.save(person);
@@ -33,7 +34,7 @@ class PersonRepositoryTest {
 
         assertThat(people.size()).isEqualTo(1);
         assertThat(people.get(0).getName()).isEqualTo("Kim");
-        assertThat(people.get(0).getAge()).isEqualTo(25);
+        //assertThat(people.get(0).getAge()).isEqualTo(25);
         assertThat(people.get(0).getBloodType()).isEqualTo("A");
 
         personRepository.deleteAll();
@@ -59,17 +60,13 @@ class PersonRepositoryTest {
 
     @Test
     void findByBirthdayBetween() {
-        /*
-        givenPerson("martin", 10, "A", LocalDate.of(1991, 8, 15));
-        givenPerson("david", 9, "B", LocalDate.of(1992, 7, 10));
-        givenPerson("dennis", 8, "O", LocalDate.of(1993, 1, 5));
-        givenPerson("sophia", 7, "AB", LocalDate.of(1994, 6, 30));
-        givenPerson("benny", 6, "A", LocalDate.of(1995, 8, 30));
-         */
 
-        List<Person> result = personRepository.findByMonthBirthday(1);
+        //8월 생일 2명인 martin과 lisa를 확인한다.
+        List<Person> result = personRepository.findByMonthOfBirthday(8);
 
-        result.forEach(System.out::println);
+        assertThat(result.size()).isEqualTo(2);
+        assertThat(result.get(0).getName()).isEqualTo("martin");
+        assertThat(result.get(1).getName()).isEqualTo("lisa");
     }
 
     /*

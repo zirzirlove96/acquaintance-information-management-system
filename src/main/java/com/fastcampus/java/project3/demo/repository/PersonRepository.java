@@ -21,10 +21,15 @@ public interface PersonRepository extends JpaRepository<Person, Long> {
     //월을 매개변수 삼아 사람을 찾는다.
     //@Query(value="select * from person where month = :month",nativeQuery = true)//Entity기반으로 query문을 수행
     @Query(value="select person from Person person where person.birthday.month = ?1")
-    List<Person> findByMonthBirthday(int month);
+    List<Person> findByMonthOfBirthday(int month);
 
 
     //nativeQuery문을 사용하여 query문을 내가 원하는 변수값으로 찾아볼 수 있다.
     //@Query(value="select * from person where month = :month and day = :day",nativeQuery = true)
     //List<Person> findByMonthofBirthday(@Param("month") int month, @Param("day") int day);
+
+
+    //실제로 삭제된 데이터를 보기 위하여 쿼리문을 작성해 준다.
+    @Query(value = "select * from Person person where person.deleted = true", nativeQuery = true)
+    List<Person> findPeopleDeleted();
 }

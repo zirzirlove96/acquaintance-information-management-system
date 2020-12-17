@@ -105,4 +105,18 @@ public class PersonService {
 
         personRepository.save(person);
     }
+
+    @Transactional
+    public void delete(Long id){
+        //Person.class에서 deleted 변수를 사용하여 삭제를 하기 위해
+        Person person = personRepository.findById(id).orElseThrow(()->new RuntimeException("아이디가 없습니다."));
+        //personRepository.deleteById(id);
+        //DAO에서 데이터를 지워준다.
+
+        //delete방식을 update하는 방향으로
+        person.setDeleted(true);
+
+        personRepository.save(person);
+
+    }
 }
