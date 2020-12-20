@@ -36,29 +36,33 @@ public class PersonController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)//결과값이 201번이 나오게끔
-    public void savePerson(@RequestBody Person person){
-        personService.save(person);
-        log.info("person -> {}",personRepository.findAll());
+    public void savePerson(@RequestBody PersonDto personDto){
+        personService.save(personDto);
+        //log.info("person -> {}",personRepository.findAll());
     }
 
     //수정
     @PutMapping(value="/{id}")
     public void modifyPerson(@PathVariable Long id, @RequestBody PersonDto personDto){
         personService.modify(id,personDto);
-        log.info("person -> {}",personRepository.findAll());
+        //log.info("person -> {}",personRepository.findAll());
     }
 
     @PatchMapping(value="/{id}")//PatchMapping은 일부 데이터만 고친다는 뜻으로 사용한다.
     public void modifyPerson(@PathVariable Long id, String name){
         personService.modify(id,name);
-        log.info("person -> {}",personRepository.findAll());
+        //log.info("person -> {}",personRepository.findAll());
     }
 
     /*delete*/
     @DeleteMapping(value="/{id}")
     public void deletePerson(@PathVariable Long id){
         personService.delete(id);
-        log.info("person -> {}",personRepository.findAll());
+
+        //log.info("person -> {}",personRepository.findAll());
+
+        //personService.delete이 이루어지면 true값이 나온다.
+        //return personRepository.findPeopleDeleted().stream().anyMatch(person -> person.getId().equals(id));
     }
 
 

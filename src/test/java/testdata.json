@@ -1,7 +1,6 @@
 //PersonControllerdml post method를 테스트 하기 위한 테스트 데이터
 {
 "name":"martin2",
-  "age":20,
-  "bloodType":"A"
+  "age":20
 }
 

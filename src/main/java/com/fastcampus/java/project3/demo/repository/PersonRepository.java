@@ -14,8 +14,6 @@ import java.util.List;
 public interface PersonRepository extends JpaRepository<Person, Long> {
 
     List<Person> findByName(String name);
-    List<Person> findByBlockIsNull(); //block이 null값인 경우에만 가져온다.
-    List<Person> findByBloodType(String bloodType);
     //List<Person> findByBirthdayBetween(LocalDate startDate, LocalDate endDate);//Between으로 조건문이 들어가게 된다.
 
     //월을 매개변수 삼아 사람을 찾는다.

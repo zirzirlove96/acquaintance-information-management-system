@@ -1,10 +1,7 @@
 package com.fastcampus.java.project3.demo.service;
 
-import com.fastcampus.java.project3.demo.domain.Birthday;
-import com.fastcampus.java.project3.demo.domain.Block;
 import com.fastcampus.java.project3.demo.domain.Person;
 import com.fastcampus.java.project3.demo.dto.PersonDto;
-import com.fastcampus.java.project3.demo.repository.BlockRepository;
 import com.fastcampus.java.project3.demo.repository.PersonRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,8 +9,6 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service //service lombok을 꼭 써줘야 한다.
 @Slf4j //Log
@@ -23,9 +18,6 @@ public class PersonService {
     //Repository에 @Autowired를 했다면 @Repository가 되어 있어야 함.
     @Autowired
     private PersonRepository personRepository;
-
-    @Autowired
-    private BlockRepository blockRepository;
 
 
     /*
@@ -55,10 +47,6 @@ public class PersonService {
 
     }*/
 
-    public List<Person> getPersonExcludeBlocks() {
-        return personRepository.findByBlockIsNull();
-    }
-
     @Transactional
     public Person getPerson(Long id){
         //Optional<Person> person = personRepository.findById(id);
@@ -78,7 +66,13 @@ public class PersonService {
         return personRepository.findByName(name);
     }
 
-    public void save(Person person) {
+    @Transactional
+    public void save(PersonDto personDto) {
+
+        Person person = new Person();
+        person.set(personDto);//personDto를 set해준다.
+        person.setName(personDto.getName());
+
         personRepository.save(person);
     }
 

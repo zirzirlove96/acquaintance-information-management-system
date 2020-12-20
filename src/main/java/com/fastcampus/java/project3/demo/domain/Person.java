@@ -40,10 +40,11 @@ public class Person {
 
     private String hobby;
 
+    /*
     @NonNull
     @Column(nullable = false)
     @NotEmpty
-    private String bloodType;
+    private String bloodType;*/
 
     private String address;
 
@@ -52,7 +53,7 @@ public class Person {
 
     private String job;
 
-    @ToString.Exclude
+    //@ToString.Exclude
     private String phoneNumber;
 
     //직접 DB에 접근하여 삭제를 하면 다시 복구할 방법이 없기 때문에
@@ -60,22 +61,12 @@ public class Person {
     @ColumnDefault("0")//0은 false 1은 true
     private boolean deleted;
 
-
-    //@OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}) //각각의 객체가 하나씩 mapping
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-    @ToString.Exclude
-    private Block block;
-
-
     public void set(PersonDto personDto){
         if(!StringUtils.isEmpty(personDto.getName())){
             this.setName(personDto.getName());
         }//string문자열이 있는 경우 set해준다.
         if(!StringUtils.isEmpty(personDto.getAddress())){
             this.setAddress(personDto.getAddress());
-        }
-        if(!StringUtils.isEmpty(personDto.getBloodType())){
-            this.setBloodType(personDto.getBloodType());
         }
         if(!StringUtils.isEmpty(personDto.getHobby())){
             this.setHobby(personDto.getHobby());
@@ -85,6 +76,10 @@ public class Person {
         }
         if(!StringUtils.isEmpty(personDto.getPhoneNumber())){
             this.setPhoneNumber(personDto.getPhoneNumber());
+        }
+        //생년월일을 등록해 준다.
+        if(personDto.getBirthday()!=null){
+            this.setBirthday(Birthday.of(personDto.getBirthday()));
         }
     }
 

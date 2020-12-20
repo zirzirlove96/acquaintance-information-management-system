@@ -12,6 +12,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @SpringBootTest
 @Transactional
@@ -20,65 +21,56 @@ class PersonRepositoryTest {
     @Autowired
     private PersonRepository personRepository;
 
+    //이름을 찾는 것에 대해 Test
+    @Test
+    void findByName() {
+        List<Person> people = personRepository.findByName("torny");
+        assertThat(people.size()).isEqualTo(1);
+
+        Person person = people.get(0);
+
+        assertAll(
+                () -> assertThat(person.getName()).isEqualTo("torny"),
+                () -> assertThat(person.getHobby()).isEqualTo("reading"),
+                () -> assertThat(person.getAddress()).isEqualTo("Seoul"),
+                () -> assertThat(person.getBirthday()).isEqualTo(Birthday.of(LocalDate.of(1991, 7, 10))),
+                () -> assertThat(person.getJob()).isEqualTo("officer"),
+                () -> assertThat(person.getPhoneNumber()).isEqualTo("010-2222-3333"),
+                () -> assertThat(person.isDeleted()).isEqualTo(false)
+        );
+    }
+
 
     @Test
-    void crud() {
-        Person person = new Person();
-        person.setName("Kim");
-        person.setBloodType("A");
+    void findByNameIfDeleted() {
+        List<Person> people = personRepository.findByName("andrew");
+        //삭제 되었으니까 0
+        assertThat(people.size()).isEqualTo(0);
 
-        personRepository.save(person);
+    }
 
-        //동명이인이 있을 수도 있기 때문에 List
-        List<Person> people = personRepository.findByName("Kim");
+    //생일 month가 맞는 사람들만 뽑아냈는지
+    @Test
+    void findByMonthOfBirthday() {
+        List<Person> people = personRepository.findByMonthOfBirthday(7);
+
+        assertThat(people.size()).isEqualTo(3);
+
+        assertAll(
+                ()->assertThat(people.get(0).getName()).isEqualTo("david"),
+                ()->assertThat(people.get(1).getName()).isEqualTo("lisa"),
+                ()->assertThat(people.get(2).getName()).isEqualTo("torny")
+        );
+    }
+
+    @Test
+    void findByPeopleDeleted() {
+        List<Person> people = personRepository.findPeopleDeleted();
 
         assertThat(people.size()).isEqualTo(1);
-        assertThat(people.get(0).getName()).isEqualTo("Kim");
-        //assertThat(people.get(0).getAge()).isEqualTo(25);
-        assertThat(people.get(0).getBloodType()).isEqualTo("A");
 
-        personRepository.deleteAll();
-        //System.out.print(people.toString());
-
-
+        assertAll(
+                ()->assertThat(people.get(0).getName()).isEqualTo("andrew")
+        );
     }
-
-    @Test
-    void findByBloodType() {
-        /*
-        givenPerson("martin", 10, "A");
-        givenPerson("david", 9, "B");
-        givenPerson("dennis", 8, "O");
-        givenPerson("sophia", 7, "AB");
-        givenPerson("benny", 6, "A");
-        givenPerson("john", 5, "A");*/
-
-        List<Person> result = personRepository.findByBloodType("A");
-
-        result.forEach(System.out::println);
-    }
-
-    @Test
-    void findByBirthdayBetween() {
-
-        //8월 생일 2명인 martin과 lisa를 확인한다.
-        List<Person> result = personRepository.findByMonthOfBirthday(8);
-
-        assertThat(result.size()).isEqualTo(2);
-        assertThat(result.get(0).getName()).isEqualTo("martin");
-        assertThat(result.get(1).getName()).isEqualTo("lisa");
-    }
-
-    /*
-    data.sql를 사용하므로 쓸 필요가 없음
-    private void givenPerson(String name, int age, String bloodType) {
-        givenPerson(name, age, bloodType, null);
-    }
-
-    private void givenPerson(String name, int age, String bloodType, LocalDate birthday) {
-        Person person = new Person(name, age, bloodType);
-        person.setBirthday(new Birthday(birthday));
-
-        personRepository.save(person);
-    }*/
 }
