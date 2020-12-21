@@ -33,6 +33,9 @@ import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
 @SpringBootTest
@@ -59,7 +62,11 @@ class PersonControllerTest {
     @BeforeEach
     void beforeEach() {
         //messageConverter를 주입해야 한다.
-        mockMvc = MockMvcBuilders.standaloneSetup(personController).setMessageConverters(messageConverter).build();
+        mockMvc = MockMvcBuilders
+                .standaloneSetup(personController)
+                .setMessageConverters(messageConverter)
+                .alwaysDo(print()) //andDo(print())를 항상 하기 위해
+                .build();
     }
 
     @Test
@@ -67,18 +74,17 @@ class PersonControllerTest {
 
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/api/person/1"))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(status().isOk())
                 //jsonPath를 사용하여 json타입으로 지정된 리스트를 가져와
                 //$->객체 , .->attribute 즉 json타입의 객체에서 name의 attribute에서 value값인 martin을 가져온다.
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("martin"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.hobby").isEmpty())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.address").isEmpty())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.birthday").value("1991-08-01"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.job").isEmpty())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.phoneNumber").isEmpty())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.deleted").value(false))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.birthdayToday").isBoolean());
+                .andExpect(jsonPath("$.name").value("martin"))
+                .andExpect(jsonPath("$.hobby").isEmpty())
+                .andExpect(jsonPath("$.address").isEmpty())
+                .andExpect(jsonPath("$.birthday").value("1991-08-01"))
+                .andExpect(jsonPath("$.job").isEmpty())
+                .andExpect(jsonPath("$.phoneNumber").isEmpty())
+                .andExpect(jsonPath("$.deleted").value(false))
+                .andExpect(jsonPath("$.birthdayToday").isBoolean());
 
     }
 
@@ -93,8 +99,7 @@ class PersonControllerTest {
                 MockMvcRequestBuilders.post("/api/person")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(toJsonString(personDto)))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isCreated());
+                .andExpect(status().isCreated());
 
         //값이 저장되었는지 확인
         //맨 마지막 값을 확인
@@ -112,6 +117,19 @@ class PersonControllerTest {
     }
 
     @Test
+    void savePersonIfNameIsNull() throws Exception {
+
+        PersonDto personDto = new PersonDto(); //빈 객체를 생성해 저장하여 error exception을 일으키자.
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/api/person")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(toJsonString(personDto)))
+        .andExpect(jsonPath("$.code").value(500))
+        .andExpect(jsonPath("$.message").value("This is not found Error"));
+    }
+
+    @Test
     void modifyPerson() throws Exception {
 
         PersonDto personDto = PersonDto.of("martin","programming","판교", LocalDate.now(),"Programmer","010-111-1111");
@@ -120,8 +138,7 @@ class PersonControllerTest {
                 MockMvcRequestBuilders.put("/api/person/1")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(toJsonString(personDto)))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isOk());
+                .andExpect(status().isOk());
 
         Person result = personRepository.findById(1L).get();
 
@@ -145,14 +162,30 @@ class PersonControllerTest {
 
         PersonDto personDto = PersonDto.of("James","programming","판교", LocalDate.now(),"Programmer","010-111-1111");
 
-        assertThrows(NestedServletException.class,()->
+
             mockMvc.perform(
                     MockMvcRequestBuilders.put("/api/person/1")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(toJsonString(personDto)))
-                    .andDo(MockMvcResultHandlers.print())
-                    .andExpect(MockMvcResultMatchers.status().isOk()));
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.code").value(400))
+                    .andExpect(jsonPath("$.message").value("이름 변경이 허용되지 않습니다"));
 
+    }
+
+
+    //id값이 존재하지 않는 경우
+    @Test
+    void modifyPersonIfPersonNotFound() throws Exception {
+        PersonDto dto = PersonDto.of("martin", "programming", "판교", LocalDate.now(), "programmer", "010-1111-2222");
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.put("/api/person/10")
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .content(toJsonString(dto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value(400))
+                .andExpect(jsonPath("$.message").value("Person Entity가 존재하지 않습니다"));
     }
 
 
@@ -162,8 +195,7 @@ class PersonControllerTest {
         mockMvc.perform(
                 MockMvcRequestBuilders.patch("/api/person/1")
                         .param("name","martinModify"))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isOk());
+                .andExpect(status().isOk());
 
         //실제 DB의 내용이 변경되었는지 확인
         assertThat(personRepository.findById(1L).get().getName()).isEqualTo("martinModify");
@@ -173,8 +205,7 @@ class PersonControllerTest {
     void deletePerson() throws Exception {
         mockMvc.perform(
                 MockMvcRequestBuilders.delete("/api/person/1"))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isOk());
+                .andExpect(status().isOk());
                 //.andExpect(MockMvcResultMatchers.content().string("true"));
 
         //삭제된 정보를 확인

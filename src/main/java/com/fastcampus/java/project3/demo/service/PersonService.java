@@ -2,6 +2,8 @@ package com.fastcampus.java.project3.demo.service;
 
 import com.fastcampus.java.project3.demo.domain.Person;
 import com.fastcampus.java.project3.demo.dto.PersonDto;
+import com.fastcampus.java.project3.demo.exception.PersonNotFoundException;
+import com.fastcampus.java.project3.demo.exception.RenameIsNotPermittedException;
 import com.fastcampus.java.project3.demo.repository.PersonRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,10 +81,10 @@ public class PersonService {
     @Transactional
     public void modify(Long id, PersonDto personDto) {
 
-        Person personAtDb = personRepository.findById(id).orElseThrow(()->new RuntimeException("아이디가 존재하지 않습니다."));
+        Person personAtDb = personRepository.findById(id).orElseThrow(PersonNotFoundException::new);
 
         if(!personAtDb.getName().equals(personDto.getName())){
-            throw new RuntimeException("이름이 다릅니다.");
+            throw new RenameIsNotPermittedException();
         }//일부러 에러를 발생시킨다.
 
         personAtDb.set(personDto);
@@ -92,7 +94,7 @@ public class PersonService {
 
     @Transactional
     public void modify(Long id, String name){
-        Person person = personRepository.findById(id).orElseThrow(()->new RuntimeException("아이디가 존재하지 않습니다."));
+        Person person = personRepository.findById(id).orElseThrow(PersonNotFoundException::new);
 
         //변경된 이름을 받는다.
         person.setName(name);
@@ -103,7 +105,7 @@ public class PersonService {
     @Transactional
     public void delete(Long id){
         //Person.class에서 deleted 변수를 사용하여 삭제를 하기 위해
-        Person person = personRepository.findById(id).orElseThrow(()->new RuntimeException("아이디가 없습니다."));
+        Person person = personRepository.findById(id).orElseThrow(PersonNotFoundException::new);
         //personRepository.deleteById(id);
         //DAO에서 데이터를 지워준다.
 
