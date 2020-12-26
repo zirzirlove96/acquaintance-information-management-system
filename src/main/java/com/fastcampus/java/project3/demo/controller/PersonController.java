@@ -70,24 +70,5 @@ public class PersonController {
         //return personRepository.findPeopleDeleted().stream().anyMatch(person -> person.getId().equals(id));
     }
 
-    //이름 변경에 대한 에러문으로 status 400 runtimeerror가 아닌 서버 내부의 에러이기 때문에.
-    @ExceptionHandler(value = RenameIsNotPermittedException.class)
-    public ResponseEntity<ErrorResponse> handleRenameNoPermittedException(RenameIsNotPermittedException ex) {
-        return new ResponseEntity<>(ErrorResponse.of(HttpStatus.BAD_REQUEST,ex.getMessage()), HttpStatus.BAD_REQUEST);
-    }
 
-    //person entity가 없는 경우 400
-    @ExceptionHandler(value = PersonNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handlePersonNotFoundException(PersonNotFoundException ex){
-        return new ResponseEntity<>(ErrorResponse.of(HttpStatus.BAD_REQUEST, ex.getMessage()),HttpStatus.BAD_REQUEST);
-    }
-
-    //위 두개의 exception이 아닌 경우 모두 다 여기로 온다.
-    //500이라는 에러가 client에게 알려지면 해커에 의해 위험한 상황이 발생할 수 있으므로
-    //ex.getMeessage()를 log에 나타내 주고, 일반적인 메세지 문구를 client에게 보여준다.
-    @ExceptionHandler(value = RuntimeException.class)
-    public ResponseEntity<ErrorResponse> handleRuntimeException(RuntimeException ex){
-        log.error("server error: ",ex.getMessage());
-        return new ResponseEntity<>(ErrorResponse.of(HttpStatus.INTERNAL_SERVER_ERROR, "This is not found Error"),HttpStatus.INTERNAL_SERVER_ERROR);
-    }
 }
